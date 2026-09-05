@@ -8,8 +8,6 @@ import (
 	"os/exec"
 	"strings"
 	"time"
-
-	"github.com/brunohradec/bookkeeper/internal/book"
 )
 
 const (
@@ -20,10 +18,15 @@ const (
 	placeholderYear = 101
 )
 
-type Reader struct{}
-
-// Ensure the Reader struct satisfies the Source interface.
-var _ book.Source = Reader{}
+// Book holds the metadata of a single book in the Calibre library.
+type Book struct {
+	ID        int
+	Title     string
+	Author    string
+	CoverPath string // empty if the book has no cover
+	Year      int    // zero if the publication date is unknown
+	Publisher string
+}
 
 // Mirrors a single book of the calibredb list JSON output.
 type listEntry struct {
@@ -35,8 +38,8 @@ type listEntry struct {
 	Publisher string `json:"publisher"`
 }
 
-// Returns every book of the Calibre library.
-func (Reader) ListBooks() ([]book.Book, error) {
+// Returns every book of the default Calibre library.
+func ListBooks() ([]Book, error) {
 	out, err := readFromCLI()
 	if err != nil {
 		return nil, err
@@ -47,7 +50,7 @@ func (Reader) ListBooks() ([]book.Book, error) {
 		return nil, fmt.Errorf("parsing %s output: %w", binary, err)
 	}
 
-	books := make([]book.Book, len(entries))
+	books := make([]Book, len(entries))
 	for i, e := range entries {
 		books[i] = e.toBook()
 	}
@@ -75,9 +78,9 @@ func readFromCLI() ([]byte, error) {
 	return stdout.Bytes(), nil
 }
 
-// Converts a calibredb list entry into a book.Book.
-func (e listEntry) toBook() book.Book {
-	return book.Book{
+// Converts a calibredb list entry into a Book.
+func (e listEntry) toBook() Book {
+	return Book{
 		ID:        e.ID,
 		Title:     e.Title,
 		Author:    e.Authors,

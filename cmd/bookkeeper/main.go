@@ -5,14 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/brunohradec/bookkeeper/internal/book"
 	"github.com/brunohradec/bookkeeper/internal/calibre"
 )
 
 func main() {
-	var source book.Source = calibre.Reader{}
-
-	books, err := source.ListBooks()
+	books, err := calibre.ListBooks()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "bookkeeper:", err)
 		os.Exit(1)
