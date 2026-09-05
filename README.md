@@ -18,6 +18,11 @@ Close the Calibre desktop app first, as it locks the library.
 bookkeeper --vault ~/Documents/Notes
 ```
 
+or from this repo using `go run`:
+```sh
+go run cmd/bookkeeper/main.go --vault ~/Documents/Notes
+```
+
 The `--vault` flag is required and must point at an existing Obsidian vault.
 
 ## Build
