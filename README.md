@@ -25,6 +25,14 @@ go run cmd/bookkeeper/main.go --vault ~/Documents/Notes
 
 The `--vault` flag is required and must point at an existing Obsidian vault.
 
+To leave out books carrying a particular Calibre tag, pass `--exclude-tag`:
+
+```sh
+bookkeeper --vault ~/Documents/Notes --exclude-tag notmine
+```
+
+The tag is matched ignoring case.
+
 ## Build
 
 ```sh

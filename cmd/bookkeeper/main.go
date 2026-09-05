@@ -12,6 +12,7 @@ import (
 
 func main() {
 	path := flag.String("vault", "", "path to the Obsidian vault (required)")
+	excludeTag := flag.String("exclude-tag", "", "skip books carrying this Calibre tag")
 	flag.Parse()
 
 	if *path == "" {
@@ -31,8 +32,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	var written, skipped int
+	var written, skipped, excluded int
 	for _, b := range books {
+		if *excludeTag != "" && b.HasTag(*excludeTag) {
+			excluded++
+			continue
+		}
+
 		ok, err := vault.Write(b)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "bookkeeper: %s: %v\n", b.Title, err)
@@ -47,5 +53,5 @@ func main() {
 		}
 	}
 
-	fmt.Printf("\n%d written, %d skipped\n", written, skipped)
+	fmt.Printf("\n%d written, %d skipped, %d excluded\n", written, skipped, excluded)
 }

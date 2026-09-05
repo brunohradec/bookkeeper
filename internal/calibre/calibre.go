@@ -12,7 +12,7 @@ import (
 
 const (
 	binary = "calibredb"
-	fields = "id,title,authors,cover,pubdate,publisher"
+	fields = "id,title,authors,cover,pubdate,publisher,tags"
 
 	// Calibre uses 101 as a placeholder year for books with an unknown year.
 	placeholderYear = 101
@@ -26,16 +26,28 @@ type Book struct {
 	CoverPath string // empty if the book has no cover
 	Year      int    // zero if the publication date is unknown
 	Publisher string
+	Tags      []string
+}
+
+func (b Book) HasTag(tag string) bool {
+	for _, t := range b.Tags {
+		if strings.EqualFold(t, tag) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // Mirrors a single book of the calibredb list JSON output.
 type listEntry struct {
-	ID        int    `json:"id"`
-	Title     string `json:"title"`
-	Authors   string `json:"authors"`
-	Cover     string `json:"cover"`
-	PubDate   string `json:"pubdate"`
-	Publisher string `json:"publisher"`
+	ID        int      `json:"id"`
+	Title     string   `json:"title"`
+	Authors   string   `json:"authors"`
+	Cover     string   `json:"cover"`
+	PubDate   string   `json:"pubdate"`
+	Publisher string   `json:"publisher"`
+	Tags      []string `json:"tags"`
 }
 
 // Returns every book of the default Calibre library.
@@ -87,6 +99,7 @@ func (e listEntry) toBook() Book {
 		CoverPath: e.Cover,
 		Year:      year(e.PubDate),
 		Publisher: e.Publisher,
+		Tags:      e.Tags,
 	}
 }
 
