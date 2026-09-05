@@ -15,7 +15,7 @@ through the Calibre command line tool, never from the Calibre database.
 Close the Calibre desktop app first, as it locks the library.
 
 ```sh
-./bookkeeper --vault ~/Documents/Notes
+bookkeeper --vault ~/Documents/Notes
 ```
 
 The `--vault` flag is required and must point at an existing Obsidian vault.
