@@ -33,6 +33,15 @@ bookkeeper --vault ~/Documents/Notes --exclude-tag notmine
 
 The tag is matched ignoring case.
 
+## What it writes
+
+Notes go into `Books/` inside the vault and cover images into `Books/covers/`.
+Both are created if missing, along with an Obsidian base named `Library.base`
+that shows the library in a card view.
+
+Existing notes and an existing base are never overwritten, so the program is
+safe to rerun after adding books to Calibre.
+
 ## Build
 
 ```sh

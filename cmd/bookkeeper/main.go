@@ -32,6 +32,16 @@ func main() {
 		os.Exit(1)
 	}
 
+	base, err := vault.WriteBase()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "bookkeeper:", err)
+		os.Exit(1)
+	}
+
+	if base {
+		fmt.Println("+ Library.base")
+	}
+
 	var written, skipped, excluded int
 	for _, b := range books {
 		if *excludeTag != "" && b.HasTag(*excludeTag) {

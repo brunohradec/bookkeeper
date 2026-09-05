@@ -16,7 +16,26 @@ const (
 
 	// The directory name inside booksDir holding cover images.
 	coversDir = "covers"
+
+	// The name of the Obsidian base written into booksDir.
+	baseName = "Library.base"
 )
+
+// The content of the Obsidian base, a card view of the library.
+const base = `views:
+  - type: cards
+    name: Bookshelf
+    filters:
+      and:
+        - file.inFolder("Books")
+        - file.ext == "md"
+    order:
+      - file.name
+      - author
+      - status
+    image: note.cover
+    imageAspectRatio: 1.55
+`
 
 // An Obsidian vault book notes are written to.
 type Vault struct {
@@ -49,11 +68,13 @@ func OpenVault(path string) (Vault, error) {
 func (v Vault) Write(b calibre.Book) (written bool, err error) {
 	notePath := filepath.Join(v.booksPath(), NoteName(b)+".md")
 
-	switch _, err := os.Stat(notePath); {
-	case err == nil:
-		return false, nil
-	case !errors.Is(err, os.ErrNotExist):
+	found, err := exists(notePath)
+	if err != nil {
 		return false, err
+	}
+
+	if found {
+		return false, nil
 	}
 
 	if b.CoverPath != "" {
@@ -68,6 +89,39 @@ func (v Vault) Write(b calibre.Book) (written bool, err error) {
 	}
 
 	return true, nil
+}
+
+// Creates the Obsidian base for the library, reporting whether it was
+// written. An existing base is left untouched.
+func (v Vault) WriteBase() (written bool, err error) {
+	basePath := filepath.Join(v.booksPath(), baseName)
+
+	found, err := exists(basePath)
+	if err != nil {
+		return false, err
+	}
+
+	if found {
+		return false, nil
+	}
+
+	if err := os.WriteFile(basePath, []byte(base), 0o644); err != nil {
+		return false, fmt.Errorf("writing base: %w", err)
+	}
+
+	return true, nil
+}
+
+// Reports whether a file exists.
+func exists(path string) (bool, error) {
+	switch _, err := os.Stat(path); {
+	case err == nil:
+		return true, nil
+	case errors.Is(err, os.ErrNotExist):
+		return false, nil
+	default:
+		return false, err
+	}
 }
 
 func (v Vault) booksPath() string {
