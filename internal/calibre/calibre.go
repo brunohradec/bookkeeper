@@ -39,6 +39,16 @@ func (b Book) HasTag(tag string) bool {
 	return false
 }
 
+func (b Book) HasAnyTag(tags []string) bool {
+	for _, tag := range tags {
+		if b.HasTag(tag) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // Mirrors a single book of the calibredb list JSON output.
 type listEntry struct {
 	ID        int      `json:"id"`
